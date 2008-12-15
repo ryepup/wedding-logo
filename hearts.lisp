@@ -9,16 +9,16 @@
 (defvar *r* 400)
 (defvar *gear-height* 5)
 
-(defun draw-outer-heart ()
+(defun draw-outer-heart (&key (line-width 3))
   "draw the heart outline, a square with 2 half-circles"
   (with-graphics-state
-    (set-line-width 3)
+    (set-line-width line-width)
     (move-to 0 0)
     (line-to 0 *r*)
     (arcn (/ *r* 2) *r* (/ *r* 2) pi 0)
     (arcn *r* (/ *r* 2) (/ *r* 2) (/ pi 2) (- (/ pi 2)))
     (line-to 0 0)
-    (stroke)))
+    (fill-and-stroke)))
 
 (defgeneric gear-internal (style radius)
   (:documentation "draws the internals of a gear, everything
@@ -28,7 +28,7 @@ inside the teeth")
     (centered-circle-path 0 0 radius)
     (fill-path)
     (centered-circle-path 0 0 (/ radius 5))
-    (set-rgb-fill 1 1 1)
+    (set-rgb-fill 0 0 0)
     (fill-path)))
 
 (defun spoked-gear-internal (radius spokes)
@@ -38,7 +38,7 @@ inside the teeth")
   (fill-path)
   ;;clear the way
   (with-graphics-state
-    (set-rgb-fill 1 1 1)
+    (set-rgb-fill 0 0 0)
     (centered-circle-path 0 0 (* 0.8 radius))
     (fill-path))
   (with-graphics-state
@@ -54,16 +54,15 @@ inside the teeth")
   (centered-circle-path 0 0 (* 0.4 radius))
   (fill-path)
   (with-graphics-state
-    (set-rgb-fill 1 1 1)
+    (set-rgb-fill 0 0 0)
     (centered-circle-path 0 0 (* 0.2 radius))
-    (fill-path))
-  )
+    (fill-path)))
 
 (defmethod gear-internal :around (style radius)
   (with-graphics-state
     (call-next-method)))
 
-(defun gear (x y radius teeth rotation &optional (spokes (random 10)))
+(defun gear (x y radius teeth rotation &key (spokes (random 10)))
   "draw a gear"
   (with-graphics-state
     (let ((gw (/ (* pi (* 2 radius)) 2 teeth)))
@@ -83,7 +82,7 @@ inside the teeth")
 
       (values radius gw))))
 
-(defun save-logo (&key (filename "heart-logo.png")
+(defun save-mug-logo (&key (filename "heart-logo.png")
 		  (font-file "Lucida Handwriting Italic.ttf")
 		  )
   "draw the logo, saving to filename and using font-file for text"
@@ -133,9 +132,43 @@ inside the teeth")
 				   (* (sqrt 2) (/ *r* 2))
 				   (* 2 label-height))
 			    "New Year's Eve 2008"))
-    (save-png filename)
-    )
-  )
+    (save-png filename)))
+
+(defun save-tattoo-logo (&key (filename "heart-tattoo.png"))
+  "draw the logo in tattoo size, saving to filename"
+  (let ((*r* 175)
+	(*gear-height* 5))
+    (with-canvas (:width (* 2 *r*)
+			 :height (truncate
+				  (* 2.25 *r*)))
+      (set-rgb-fill 1 1 1)
+      (clear-canvas)
+      (set-rgb-fill 0 0 0)
+      (set-rgb-stroke 0 0 0)
+      (with-graphics-state
+	(with-graphics-state
+	  (translate *r* (- *r* (* (sqrt 2) (/ *r* 2))))
+	  (rotate (/ pi 4))
+	  (draw-outer-heart))
+	(set-rgb-fill 1 1 1)
+	(let ((*r* (* .985 *r*)))
+	  (loop for (x y r teeth rotation) in '((1.08 1.5 .15 8 0)
+						(.6 1.4 .35 18 0)
+						(.87 .9 .24 14 0)
+						(1 .55 .13 8 0)
+						)
+		do
+	     (gear (* x *r*)
+		   (* y *r*)
+		   (* r *r*)
+		   teeth
+		   rotation))))
+      (save-png filename))))
+
+
+
+
+
 
 (defun make-samples (&optional (n 20))
   "make a bunch to try and get a good random set"
