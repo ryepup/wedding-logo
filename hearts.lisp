@@ -140,19 +140,5 @@ inside the teeth")
 (defun make-samples (&optional (n 20))
   "make a bunch to try and get a good random set"
   (dotimes (i n)
-    (save-logo :filename (format nil "heart_~a.png" i))
-    )
-  )
-
-(defun test-fonts ()
-  "renders a logo in a variety of fonts so I can see what looks good."
-  (let ((r (cl-ppcre:create-scanner "/")))
-    (with-open-file (f "/home/ryan/clbuild/source/wedding/fonts.txt")
-      (loop for fontfile = (read-line f nil nil)
-	    while fontfile
-	    do
-	 (save-logo :font-file fontfile
-	      :filename (format nil "/home/ryan/clbuild/source/wedding/~a.png"
-				    (cl-ppcre:regex-replace-all
-				     r fontfile ".")))))))
+    (save-logo :filename (format nil "heart_~a.png" i))))
 

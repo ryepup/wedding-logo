@@ -1,0 +1,6 @@
+#ignore emacs temp files
+*~
+#ignore fasls
+*.fasl
+#ignore some temporarily generated images
+heart_*.png
